@@ -1,8 +1,8 @@
 {
-    "appId": "A2U52SWpT",
-    "name": "社区",
+    "appId": "KxH4-Nya_13",
+    "name": "颜色取色11",
     "version": "1.0.0",
-    "description": "开发交流社区",
+    "description": "应用描述",
     "main": "index.html",
     "preload": "preload.js",
     "logo": "logo.png",
@@ -10,7 +10,7 @@
     "keyWords": ["cool-ai", "cool"],
     "xiaoku": { "hide": false },
     "dev": {
-        "main": "http://127.0.0.1:8081",
+        "main": "http://127.0.0.1:8080",
         "preload": "src/preload.js",
         "logo": "src/assets/logo.png"
     }

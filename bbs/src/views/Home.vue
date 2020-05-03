@@ -1,17 +1,17 @@
 <template>
   <div>
-    <release/>
+    <list/>
   </div>
 </template>
 
 <script>
 // @ is an alias to /src
-import release from '@/components/release.vue'
+import list from '@/components/list'
 
 export default {
   name: 'Home',
   components: {
-    release
+    list
   }
 }
 </script>
