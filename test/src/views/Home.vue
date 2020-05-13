@@ -1,25 +1,20 @@
 <template>
-  <div id="editorjs"></div>
+  <div class="home">
+    <img alt="Vue logo" src="../assets/logo.png">
+    <HelloWorld msg="Welcome to Your Vue.js App"/>
+  </div>
 </template>
 
 <script>
-import EditorJS from "@editorjs/editorjs";
-import Header from "@editorjs/header";
-import List from "@editorjs/list";
+// @ is an alias to /src
+import HelloWorld from '@/components/HelloWorld.vue'
+
 export default {
-  components: {},
-  data() {
-    return {};
+  name: 'Home',
+  components: {
+    HelloWorld
   },
-  mounted() {
-    new EditorJS({
-      placeholder: '请输入发布的内容',
-      holderId: "editorjs",
-      tools: {
-        header: Header,
-        list: List
-      }
-    });
-  }
-};
+  methods: {
+  },
+}
 </script>
