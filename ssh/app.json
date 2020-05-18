@@ -1,0 +1,17 @@
+{
+    "appId": "qBclYwfaL",
+    "name": "SSH",
+    "version": "0.0.1",
+    "description": "远程连接Liunx服务器",
+    "main": "index.html",
+    "preload": "preload.js",
+    "logo": "logo.png",
+    "platform": ["win32", "darwin"],
+    "keyWords": ["cool-ai", "cool"],
+    "xiaoku": { "hide": false },
+    "dev": {
+        "main": "http://127.0.0.1:8081",
+        "preload": "src/preload.js",
+        "logo": "src/assets/logo.png"
+    }
+}
