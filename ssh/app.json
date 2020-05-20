@@ -8,7 +8,7 @@
     "logo": "logo.png",
     "platform": ["win32", "darwin"],
     "keyWords": ["cool-ai", "cool"],
-    "xiaoku": { "hide": true },
+    "xiaoku": { "hide": false },
     "dev": {
         "main": "http://127.0.0.1:8081",
         "preload": "src/preload.js",
