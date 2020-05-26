@@ -1,47 +1,68 @@
 <template>
-  <div class="terminal">
-    <!-- <button @click="test">测试13123</button> -->
-    <img @click="showMenu" src="@/assets/menu.png" />
-    <div v-if="showTerm" id="terminal"></div>
-    <el-drawer title="我是标题" direction="rtl" :visible.sync="drawer" :with-header="false">
-      <el-menu
-        :default-active="activeIndex"
-        class="el-menu-demo"
-        mode="horizontal"
-        background-color="#253238"
-        text-color="#fff"
-        active-text-color="#ffd04b"
-      >
-        <el-menu-item index="1">
-          <i class="el-icon-s-help"></i>
-          <span slot="title">连接</span>
-        </el-menu-item>
-        <el-menu-item index="2">
-          <i class="el-icon-s-flag"></i>
-          <span slot="title">命令</span>
-        </el-menu-item>
-      </el-menu>
-      <el-menu
-        :default-active="activeIndex"
-        mode="vertical"
-        background-color="#253238"
-        text-color="#fff"
-        active-text-color="#ffd04b"
-        style="height: 460px;overflow-y: scroll;"
-      >
-        <el-menu-item
-          v-for="n in 20"
-          :key="n"
-          :index="n.toString()"
-          style=" width: 100%;text-align: left;"
+  <div>
+    <el-dialog :title="activeIndex == '1'?'新增连接':'新增命令'" :visible.sync="dialogVisible" width="80%">
+      <el-form ref="connForm" :rules="rules" label-position="left" :model="form" label-width="65px">
+        <el-form-item label="名称" prop="name">
+          <el-input v-model="form.name"></el-input>
+        </el-form-item>
+        <el-form-item label="IP地址" prop="ipAddress">
+          <el-input v-model="form.ipAddress"></el-input>
+        </el-form-item>
+        <el-form-item label="用户" prop="username">
+          <el-input v-model="form.username"></el-input>
+        </el-form-item>
+        <el-form-item label="密码" prop="password">
+          <el-input v-model="form.password"></el-input>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="dialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="submitForm('connForm')">确 定</el-button>
+      </span>
+    </el-dialog>
+    <div class="terminal">
+      <img @click="showMenu" src="@/assets/menu.png" />
+      <img v-if="drawer" @click="openForm" style="z-index:100000" src="@/assets/add.png" />
+      <div v-if="showTerm" id="terminal"></div>
+      <el-drawer direction="rtl" :visible.sync="drawer" :with-header="false">
+        <context-menu ref="context-menu"></context-menu>
+        <el-menu
+          :default-active="activeIndex"
+          class="el-menu-demo"
+          mode="horizontal"
+          background-color="#253238"
+          text-color="#fff"
+          @select="menuSelect"
+          active-text-color="#ffd04b"
         >
-          <span slot="title">阿里云服务器{{n}}</span>
-        </el-menu-item>
-        <!-- <el-menu-item index="2" style=" width: 100%;text-align: left;">
-          <span slot="title">华为云服务器</span>
-        </el-menu-item>-->
-      </el-menu>
-    </el-drawer>
+          <el-menu-item index="1">
+            <i class="el-icon-s-help"></i>
+            <span slot="title" class="noselect">连接</span>
+          </el-menu-item>
+          <el-menu-item index="2">
+            <i class="el-icon-s-flag"></i>
+            <span slot="title" class="noselect">命令</span>
+          </el-menu-item>
+        </el-menu>
+        <el-menu
+          :default-active="openIndex"
+          mode="vertical"
+          background-color="#253238"
+          text-color="#fff"
+          active-text-color="#ffd04b"
+          style="height: 460px;overflow-y: scroll;"
+        >
+          <el-menu-item
+            v-for="(item, index) in connList"
+            :key="index"
+            :index="item.id"
+            style=" width: 100%;text-align: left;"
+          >
+            <span slot="title" @contextmenu="e => openMenu(e, item)" class="noselect">{{item.name}}</span>
+          </el-menu-item>
+        </el-menu>
+      </el-drawer>
+    </div>
   </div>
 </template>
 
@@ -49,6 +70,7 @@
 import "xterm/css/xterm.css";
 import { Terminal } from "xterm";
 import { FitAddon } from "xterm-addon-fit";
+import ContextMenu from "@/components/context-menu";
 
 export default {
   name: "xterm",
@@ -57,17 +79,81 @@ export default {
   },
   data() {
     return {
+      rules: {
+        name: [{ required: true, message: "请输入名称", trigger: "blur" }],
+        ipAddress: [
+          { required: true, message: "请输入IP地址", trigger: "blur" }
+        ],
+        username: [{ required: true, message: "请输入用户", trigger: "blur" }],
+        password: [{ required: true, message: "请输入密码", trigger: "blur" }]
+      },
+      form: {
+        name: "",
+        ipAddress: "",
+        username: "",
+        password: ""
+      },
+      dialogVisible: false,
+      openIndex: "1",
       activeIndex: "1",
       drawer: false,
       sshClient: null,
       term: null,
       stream: null,
-      showTerm: false
+      showTerm: false,
+      connList: [],
+      commandList: []
     };
   },
+  watch: {
+    dialogVisible: function(n, o) {
+      console.log(n, o);
+      this.resetForm("connForm");
+      this.resetForm("commandForm");
+    }
+  },
+  components: { ContextMenu },
   methods: {
+    resetForm(formName) {
+      this.$nextTick(() => {
+        if (this.$refs[formName]) {
+          this.$refs[formName].resetFields();
+        }
+      });
+    },
+    submitForm(formName) {
+      this.$refs[formName].validate(valid => {
+        if (valid) {
+          window.cool.db.upsert("conn", this.form).then(res => {
+            console.log(res);
+            this.dialogVisible = false;
+          });
+        } else {
+          return false;
+        }
+      });
+    },
+    openForm() {
+      this.dialogVisible = true;
+    },
+    menuSelect(index) {
+      this.activeIndex = index;
+    },
+    onmouseEvent() {
+      document.onmousedown = () => {
+        if (this.$refs["context-menu"]) {
+          this.$refs["context-menu"].close();
+        }
+      };
+    },
     showMenu() {
       this.drawer = !this.drawer;
+      window.cool.db.find('conn').then(res=>{
+        this.connList = res;
+      })
+      window.cool.db.find('conn').then(res=>{
+        this.connList = res;
+      })
     },
     test() {
       this.stream.write(`cd /home \r`);
@@ -87,7 +173,7 @@ export default {
       const fitAddon = new FitAddon();
       this.term.loadAddon(fitAddon);
       this.term.open(document.getElementById("terminal"));
-      this.term.write("欢迎使用 COOL-AI SSH \r\n");
+      this.term.write("欢迎使用 COOL-AI SSH www.cool-js.com \r\n");
       this.term.focus();
       fitAddon.fit();
 
@@ -118,18 +204,55 @@ export default {
           password: "abc123456+",
           keepaliveInterval: 10000
         });
+    },
+    openMenu(e, item) {
+      this.openIndex = item.id.toString();
+      this.$refs["context-menu"].open(e, {
+        list: [
+          {
+            label: this.activeIndex == 1 ? "打开" : "执行",
+            callback: (e, close) => {
+              close();
+            }
+          },
+          {
+            label: "编辑",
+            callback: (e, close) => {
+              close();
+            }
+          },
+          {
+            label: "删除",
+            callback: (e, close) => {
+              close();
+            }
+          }
+        ]
+      });
     }
   },
   mounted() {
     this.showTerm = true;
+    this.onmouseEvent();
     this.$nextTick(() => {
       this.initConn();
     });
   }
 };
 </script>
-
+<style lang="scss">
+.el-dialog {
+  /deep/ .el-dialog__body {
+    padding: 20px 20px 0px !important;
+  }
+}
+</style>
 <style scoped lang="scss">
+// .el-form {
+//   /deep/ .el-form-item {
+//     height: 45px;
+//   }
+// }
 /deep/ .el-drawer__body {
   background-color: #253238;
 }
@@ -158,5 +281,16 @@ export default {
     width: 100%;
     height: calc(100vh);
   }
+}
+
+.noselect {
+  padding: 20px 90px 20px 0px;
+  -webkit-touch-callout: none; /* iOS Safari */
+  -webkit-user-select: none; /* Chrome/Safari/Opera */
+  -khtml-user-select: none; /* Konqueror */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* Internet Explorer/Edge */
+  user-select: none; /* Non-prefixed version, currently
+not supported by any browser */
 }
 </style>

@@ -1,4 +1,24 @@
 {
     "isCloud": false,
-    "tables": []
+    "tables": [{
+        "name": "conn",
+        "model": {
+            "id:int": {
+                "pk": true,
+                "ai": true
+            },
+            "name:string": {
+                "notNull": true
+            },
+            "ipAddress:string": {
+                "notNull": true
+            },
+            "username:string": {
+                "notNull": true
+            },
+            "password:string": {
+                "notNull": true
+            }
+        }
+    }]
 }

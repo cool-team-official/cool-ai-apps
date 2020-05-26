@@ -1,0 +1,57 @@
+.context-menu {
+  position: fixed;
+  z-index: 9999;
+}
+.context-menu .context-menu-box {
+  box-shadow: 0 2px 12px 0 rgba(0,0,0,0.1);
+  width: 160px;
+  padding: 5px 0;
+  background-color: #fff;
+  border-radius: 3px;
+  position: absolute;
+  top: 0;
+}
+.context-menu .context-menu-box._append {
+  right: calc(-100% - 5px);
+  top: -5px;
+}
+.context-menu .context-menu-box>div {
+  display: flex;
+  align-items: center;
+  height: 35px;
+  font-size: 13px;
+  cursor: pointer;
+  padding: 0 15px;
+  color: #666;
+  position: relative;
+}
+.context-menu .context-menu-box>div span {
+  height: 35px;
+  line-height: 35px;
+  flex: 1;
+}
+.context-menu .context-menu-box>div:hover {
+  background-color: #f7f7f7;
+  color: #000;
+}
+.context-menu .context-menu-box>div i:first-child {
+  margin-right: 5px;
+}
+.context-menu .context-menu-box>div i:last-child {
+  margin-left: 5px;
+}
+.context-menu .context-menu-box>div._active {
+  background-color: #f7f7f7;
+  color: #000;
+}
+.context-menu .context-menu-box>div._ellipsis span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.context-menu .context-menu-box>div._disabled span {
+  color: #ccc;
+}
+.context-menu .context-menu-box>div._disabled span:hover {
+  color: #ccc;
+}
