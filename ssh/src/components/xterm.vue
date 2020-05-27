@@ -1,23 +1,53 @@
 <template>
   <div>
-    <el-dialog :title="activeIndex == '1'?'新增连接':'新增命令'" :visible.sync="dialogVisible" width="80%">
-      <el-form ref="connForm" :rules="rules" label-position="left" :model="form" label-width="65px">
+    <el-dialog
+      :title="activeIndex == '1'?(form.id?'编辑连接':'新增连接'):(form.id?'编辑命令':'新增命令')"
+      :visible.sync="dialogVisible"
+      width="80%"
+    >
+      <el-form
+        v-if="activeIndex=='1'"
+        ref="connForm"
+        :rules="rules"
+        label-position="left"
+        :model="form.conn"
+        label-width="65px"
+      >
         <el-form-item label="名称" prop="name">
-          <el-input v-model="form.name"></el-input>
+          <el-input v-model="form.conn.name"></el-input>
         </el-form-item>
         <el-form-item label="IP地址" prop="ipAddress">
-          <el-input v-model="form.ipAddress"></el-input>
+          <el-input v-model="form.conn.ipAddress"></el-input>
         </el-form-item>
         <el-form-item label="用户" prop="username">
-          <el-input v-model="form.username"></el-input>
+          <el-input v-model="form.conn.username"></el-input>
         </el-form-item>
         <el-form-item label="密码" prop="password">
-          <el-input v-model="form.password"></el-input>
+          <el-input v-model="form.conn.password"></el-input>
+        </el-form-item>
+      </el-form>
+      <el-form
+        v-if="activeIndex=='2'"
+        ref="commandForm"
+        :rules="rules"
+        label-position="left"
+        :model="form.command"
+        label-width="65px"
+      >
+        <el-form-item label="名称" prop="name">
+          <el-input v-model="form.command.name"></el-input>
+        </el-form-item>
+        <el-form-item label="命令" prop="content">
+          <el-input type="textarea" v-model="form.command.content" rows="5"></el-input>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="dialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="submitForm('connForm')">确 定</el-button>
+        <el-button @click="dialogVisible = false" size="small">取 消</el-button>
+        <el-button
+          type="primary"
+          @click="submitForm(activeIndex == '1'?'connForm':'commandForm')"
+          size="small"
+        >确 定</el-button>
       </span>
     </el-dialog>
     <div class="terminal">
@@ -53,10 +83,22 @@
           style="height: 460px;overflow-y: scroll;"
         >
           <el-menu-item
+            v-show="activeIndex == '1'"
             v-for="(item, index) in connList"
-            :key="index"
-            :index="item.id"
+            :key="'conn'+index"
+            :index="item.id.toString()"
             style=" width: 100%;text-align: left;"
+            @dblclick.native="doAction(item)"
+          >
+            <span slot="title" @contextmenu="e => openMenu(e, item)" class="noselect">{{item.name}}</span>
+          </el-menu-item>
+          <el-menu-item
+            v-show="activeIndex == '2'"
+            v-for="(item, index) in commandList"
+            :key="'command'+index"
+            :index="item.id.toString()"
+            style=" width: 100%;text-align: left;"
+            @dblclick.native="doAction(item)"
           >
             <span slot="title" @contextmenu="e => openMenu(e, item)" class="noselect">{{item.name}}</span>
           </el-menu-item>
@@ -85,13 +127,22 @@ export default {
           { required: true, message: "请输入IP地址", trigger: "blur" }
         ],
         username: [{ required: true, message: "请输入用户", trigger: "blur" }],
-        password: [{ required: true, message: "请输入密码", trigger: "blur" }]
+        password: [{ required: true, message: "请输入密码", trigger: "blur" }],
+        content: [
+          { required: true, message: "请输入命令内容", trigger: "blur" }
+        ]
       },
       form: {
-        name: "",
-        ipAddress: "",
-        username: "",
-        password: ""
+        conn: {
+          name: "",
+          ipAddress: "",
+          username: "",
+          password: ""
+        },
+        command: {
+          name: "",
+          content: ""
+        }
       },
       dialogVisible: false,
       openIndex: "1",
@@ -124,16 +175,24 @@ export default {
     submitForm(formName) {
       this.$refs[formName].validate(valid => {
         if (valid) {
-          window.cool.db.upsert("conn", this.form).then(res => {
-            console.log(res);
-            this.dialogVisible = false;
-          });
+          window.cool.db
+            .upsert(
+              this.activeIndex == "1" ? "conn" : "command",
+              this.form[this.activeIndex == "1" ? "conn" : "command"]
+            )
+            .then(() => {
+              this.initData();
+              this.dialogVisible = false;
+            });
         } else {
           return false;
         }
       });
     },
     openForm() {
+      delete this.form.id;
+      this.resetForm("connForm");
+      this.resetForm("commandForm");
       this.dialogVisible = true;
     },
     menuSelect(index) {
@@ -148,15 +207,26 @@ export default {
     },
     showMenu() {
       this.drawer = !this.drawer;
-      window.cool.db.find('conn').then(res=>{
-        this.connList = res;
-      })
-      window.cool.db.find('conn').then(res=>{
-        this.connList = res;
-      })
+      this.initData();
     },
-    test() {
-      this.stream.write(`cd /home \r`);
+    initData() {
+      window.cool.db
+        .find("conn", {
+          orderBy: ["id DESC"]
+        })
+        .then(res => {
+          this.connList = res;
+        });
+      window.cool.db
+        .find("command", {
+          orderBy: ["id DESC"]
+        })
+        .then(res => {
+          this.commandList = res;
+        });
+    },
+    exeCommand(content) {
+      this.stream.write(`${content} \r`);
     },
     initConn() {
       this.term = new Terminal({
@@ -175,16 +245,22 @@ export default {
       this.term.open(document.getElementById("terminal"));
       this.term.write("欢迎使用 COOL-AI SSH www.cool-js.com \r\n");
       this.term.focus();
+      this.term.onData(data => {
+        this.stream.write(data);
+      });
       fitAddon.fit();
-
-      window.sshClient
+    },
+    connServe(conf) {
+      if (this.sshClient) {
+        this.exeCommand("exit");
+      }
+      const client = new window.sshClient();
+      client
         .on("ready", () => {
-          this.sshClient = window.sshClient;
-          window.sshClient.shell((err, stream) => {
+          this.sshClient = client;
+          client.shell((err, stream) => {
+            this.term.clear();
             this.stream = stream;
-            this.term.onData(data => {
-              stream.write(data);
-            });
             stream.on("data", data => {
               this.term.write(data.toString("utf-8"));
             });
@@ -192,18 +268,28 @@ export default {
               console.log(
                 "Stream :: close :: code: " + code + ", signal: " + signal
               );
-              this.term.write("长时间未操作，已失去连接，请重连！ \r\n");
-              this.sshClient.end();
+              stream.end();
+              stream.close();
+              //this.stream = null;
+              //this.term.write("长时间未操作，已失去连接，请重连！ \r\n");
+              //this.sshClient.end();
             });
           });
         })
         .connect({
-          host: "123.57.135.188",
+          host: conf.ipAddress,
           port: 22,
-          username: "root",
-          password: "abc123456+",
+          username: conf.username,
+          password: conf.password,
           keepaliveInterval: 10000
         });
+    },
+    doAction(item) {
+      if (this.activeIndex == "1") {
+        this.connServe(item);
+      } else {
+        this.exeCommand(item.content);
+      }
     },
     openMenu(e, item) {
       this.openIndex = item.id.toString();
@@ -212,19 +298,37 @@ export default {
           {
             label: this.activeIndex == 1 ? "打开" : "执行",
             callback: (e, close) => {
+              this.doAction(item);
               close();
             }
           },
           {
             label: "编辑",
             callback: (e, close) => {
+              console.log("打开的信息", item);
+              this.resetForm("connForm");
+              this.dialogVisible = true;
+              this.$nextTick(() => {
+                this.form[
+                  this.activeIndex == "1" ? "conn" : "command"
+                ] = Object.assign({}, item);
+              });
               close();
             }
           },
           {
             label: "删除",
             callback: (e, close) => {
-              close();
+              window.cool.db
+                .delete(this.activeIndex == "1" ? "conn" : "command", [
+                  "id",
+                  "=",
+                  item.id
+                ])
+                .then(() => {
+                  this.initData();
+                  close();
+                });
             }
           }
         ]
@@ -233,7 +337,7 @@ export default {
   },
   mounted() {
     this.showTerm = true;
-    this.onmouseEvent();
+    //this.onmouseEvent();
     this.$nextTick(() => {
       this.initConn();
     });
@@ -284,7 +388,7 @@ export default {
 }
 
 .noselect {
-  padding: 20px 90px 20px 0px;
+  padding: 20px 150px 20px 0px;
   -webkit-touch-callout: none; /* iOS Safari */
   -webkit-user-select: none; /* Chrome/Safari/Opera */
   -khtml-user-select: none; /* Konqueror */

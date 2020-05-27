@@ -1,24 +1,40 @@
 {
     "isCloud": false,
     "tables": [{
-        "name": "conn",
-        "model": {
-            "id:int": {
-                "pk": true,
-                "ai": true
-            },
-            "name:string": {
-                "notNull": true
-            },
-            "ipAddress:string": {
-                "notNull": true
-            },
-            "username:string": {
-                "notNull": true
-            },
-            "password:string": {
-                "notNull": true
+            "name": "conn",
+            "model": {
+                "id:int": {
+                    "pk": true,
+                    "ai": true
+                },
+                "name:string": {
+                    "notNull": true
+                },
+                "ipAddress:string": {
+                    "notNull": true
+                },
+                "username:string": {
+                    "notNull": true
+                },
+                "password:string": {
+                    "notNull": true
+                }
+            }
+        },
+        {
+            "name": "command",
+            "model": {
+                "id:int": {
+                    "pk": true,
+                    "ai": true
+                },
+                "name:string": {
+                    "notNull": true
+                },
+                "content:string": {
+                    "notNull": true
+                }
             }
         }
-    }]
+    ]
 }
