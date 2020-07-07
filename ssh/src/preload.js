@@ -7,3 +7,8 @@ window.cool.event.onAppReady(() => {
 window.cool.event.onAppOpen(() => {
     console.log('应用被打开了！')
 })
+
+
+window.aaaa = ()=>{
+    console.log(1111111)
+}

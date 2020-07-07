@@ -336,6 +336,10 @@ export default {
     }
   },
   mounted() {
+    window.cool.event.onAppReady(() => {
+        window.aaaa()
+    });
+    //window.aaaa();
     this.showTerm = true;
     //this.onmouseEvent();
     this.$nextTick(() => {
