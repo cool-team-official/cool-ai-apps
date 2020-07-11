@@ -1,12 +1,12 @@
 <template>
   <div>
     <el-dialog
-      :title="activeIndex == '1'?(form.id?'编辑连接':'新增连接'):(form.id?'编辑命令':'新增命令')"
+      :title="form.conn.id ? '编辑' : '新增'"
       :visible.sync="dialogVisible"
       width="80%"
     >
       <el-form
-        v-if="activeIndex=='1'"
+        v-if="activeIndex == '1'"
         ref="connForm"
         :rules="rules"
         label-position="left"
@@ -23,11 +23,11 @@
           <el-input v-model="form.conn.username"></el-input>
         </el-form-item>
         <el-form-item label="密码" prop="password">
-          <el-input v-model="form.conn.password"></el-input>
+          <el-input type="password" v-model="form.conn.password"></el-input>
         </el-form-item>
       </el-form>
       <el-form
-        v-if="activeIndex=='2'"
+        v-if="activeIndex == '2'"
         ref="commandForm"
         :rules="rules"
         label-position="left"
@@ -38,21 +38,31 @@
           <el-input v-model="form.command.name"></el-input>
         </el-form-item>
         <el-form-item label="命令" prop="content">
-          <el-input type="textarea" v-model="form.command.content" rows="5"></el-input>
+          <el-input
+            type="textarea"
+            v-model="form.command.content"
+            rows="5"
+          ></el-input>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="dialogVisible = false" size="small">取 消</el-button>
         <el-button
           type="primary"
-          @click="submitForm(activeIndex == '1'?'connForm':'commandForm')"
+          @click="submitForm(activeIndex == '1' ? 'connForm' : 'commandForm')"
           size="small"
-        >确 定</el-button>
+          >确 定</el-button
+        >
       </span>
     </el-dialog>
     <div class="terminal">
       <img @click="showMenu" src="@/assets/menu.png" />
-      <img v-if="drawer" @click="openForm" style="z-index:100000" src="@/assets/add.png" />
+      <img
+        v-if="drawer"
+        @click="openForm"
+        style="z-index:100000"
+        src="@/assets/add.png"
+      />
       <div v-if="showTerm" id="terminal"></div>
       <el-drawer direction="rtl" :visible.sync="drawer" :with-header="false">
         <context-menu ref="context-menu"></context-menu>
@@ -85,22 +95,32 @@
           <el-menu-item
             v-show="activeIndex == '1'"
             v-for="(item, index) in connList"
-            :key="'conn'+index"
+            :key="'conn' + index"
             :index="item.id.toString()"
             style=" width: 100%;text-align: left;"
             @dblclick.native="doAction(item)"
           >
-            <span slot="title" @contextmenu="e => openMenu(e, item)" class="noselect">{{item.name}}</span>
+            <span
+              slot="title"
+              @contextmenu="e => openMenu(e, item)"
+              class="noselect"
+              >{{ item.name }}</span
+            >
           </el-menu-item>
           <el-menu-item
             v-show="activeIndex == '2'"
             v-for="(item, index) in commandList"
-            :key="'command'+index"
+            :key="'command' + index"
             :index="item.id.toString()"
             style=" width: 100%;text-align: left;"
             @dblclick.native="doAction(item)"
           >
-            <span slot="title" @contextmenu="e => openMenu(e, item)" class="noselect">{{item.name}}</span>
+            <span
+              slot="title"
+              @contextmenu="e => openMenu(e, item)"
+              class="noselect"
+              >{{ item.name }}</span
+            >
           </el-menu-item>
         </el-menu>
       </el-drawer>
@@ -190,7 +210,7 @@ export default {
       });
     },
     openForm() {
-      delete this.form.id;
+      delete this.form.conn.id;
       this.resetForm("connForm");
       this.resetForm("commandForm");
       this.dialogVisible = true;
@@ -276,6 +296,10 @@ export default {
             });
           });
         })
+        .on("error", err => {
+          console.log("链接失败", err);
+          this.term.write("连接失败， 请检查账户密码是否正确 \r\n");
+        })
         .connect({
           host: conf.ipAddress,
           port: 22,
@@ -336,8 +360,8 @@ export default {
     }
   },
   mounted() {
-    window.cool.tools.join('', 'preload.js');
-    window.aaaa()
+    window.cool.tools.join("", "preload.js");
+    window.aaaa();
     //window.aaaa();
     this.showTerm = true;
     //this.onmouseEvent();
