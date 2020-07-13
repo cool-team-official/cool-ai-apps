@@ -1,4 +1,4 @@
-const Client = require("electron-ssh2").Client;
+const Client = require("ssh2").Client;
 window.sshClient = Client;
 // 这是个预加载的JS
 window.cool.event.onAppReady(() => {

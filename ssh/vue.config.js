@@ -2,9 +2,15 @@ const CopyWebpackPlugin = require("copy-webpack-plugin");
 module.exports = {
   publicPath: "./",
   configureWebpack: {
+    module: {
+      rules: [{
+        test: /\.js$/,
+        use: "babel-loader",
+        exclude: /node_modules/
+      }, ]
+    },
     plugins: [
-      new CopyWebpackPlugin([
-        {
+      new CopyWebpackPlugin([{
           from: "app.json",
           to: "app.json"
         },
