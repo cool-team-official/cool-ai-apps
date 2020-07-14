@@ -18,7 +18,11 @@ module.exports = {
                 {
                     from: "README.md",
                     to: "README.md"
-                }
+                },
+                {
+                    from: 'db.json',
+                    to: 'db.json'
+                },
             ])
         ]
     }
