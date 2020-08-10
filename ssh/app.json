@@ -1,7 +1,7 @@
 {
     "appId": "qBclYwfaL",
     "name": "SSH",
-    "version": "0.1.7",
+    "version": "0.1.8",
     "description": "远程连接Liunx服务器",
     "main": "index.html",
     "preload": "preload.js",
