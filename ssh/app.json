@@ -1,7 +1,7 @@
 {
     "appId": "qBclYwfaL",
     "name": "SSH",
-    "version": "0.1.8",
+    "version": "0.1.9",
     "description": "远程连接Liunx服务器",
     "main": "index.html",
     "preload": "preload.js",
@@ -9,7 +9,7 @@
     "platform": ["win32", "darwin"],
     "keyWords": ["cool-ai", "cool"],
     "xiaoku": {
-        "hide": false
+        "hide": true
     },
     "dev": {
         "main": "http://127.0.0.1:8081",
