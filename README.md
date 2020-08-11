@@ -114,26 +114,26 @@ project
 
 打开或运行COOL-AI->微信扫码登录->点击头像进入开发者中心
 
-<img src="https://docs-ai.cool-js.com/img/home.png" width="700" height="450"  style="border:1px solid #fff;border-width:5px 5px 5px 5px;box-shadow:1px 1px 5px #333; -webkit-box-shadow:1px 1px 5px #333;-moz-box-shadow:1px 1px 5px #333;"/>
-
+![home](./imgs/home.png)
 
 ##### 2、在开发者中心创建应用
 
 将之前创建好的项目中的`app.json`文件拖入开发者中心，就会自动创建一个对应的项目
 
-<img src="https://docs-ai.cool-js.com/img/dev.png" width="700" height="450"  style="border:1px solid #fff;border-width:5px 5px 5px 5px;box-shadow:1px 1px 5px #333; -webkit-box-shadow:1px 1px 5px #333;-moz-box-shadow:1px 1px 5px #333;"/>
+![home](./imgs/dev.png)
 
 
 #### 3、运行应用
 
 点击运行按钮，就可以看到对应应用的运行窗口啦
 
-<img src="https://docs-ai.cool-js.com/img/run.png" width="700" height="450"  style="border:1px solid #fff;border-width:5px 5px 5px 5px;box-shadow:1px 1px 5px #333; -webkit-box-shadow:1px 1px 5px #333;-moz-box-shadow:1px 1px 5px #333;"/>
+![home](./imgs/run.png)
 
 #### 4、上传应用
 
 点击上传按钮，填写版本信息，点确定后应用会自动打包编译并上传
 
-<img src="https://docs-ai.cool-js.com/img/release1.png" width="700" height="450"  style="border:1px solid #fff;border-width:5px 5px 5px 5px;box-shadow:1px 1px 5px #333; -webkit-box-shadow:1px 1px 5px #333;-moz-box-shadow:1px 1px 5px #333;"/>
+![home](./imgs/release1.png)
 
-<img src="https://docs-ai.cool-js.com/img/release2.png" width="700" height="450"  style="border:1px solid #fff;border-width:5px 5px 5px 5px;box-shadow:1px 1px 5px #333; -webkit-box-shadow:1px 1px 5px #333;-moz-box-shadow:1px 1px 5px #333;"/>
+![home](./imgs/release2.png)
+
